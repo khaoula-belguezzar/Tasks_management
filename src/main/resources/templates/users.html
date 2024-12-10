@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{Template}" >
+<head>
+    <meta charset="UTF-8">
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="../static/css/users.css" rel="stylesheet" th:href="@{/css/users.css}" type="text/css">
+    <title>Sync - Taches</title>
+    <link rel="icon" th:href="@{/img/favicon.png}">
+    <link href="../static/css/styleDash.css" rel="stylesheet" th:href="@{/css/styleDash.css}" type="text/css">
+
+    <style>
+        .hight{
+            background: rgba(220, 53, 69, 0.71);
+        }
+        .normal{
+            background: rgba(52, 206, 87, 0.77);
+        }
+        .low{
+            background: rgba(60, 145, 230, 0.78);
+        }
+    </style>
+</head>
+<body>
+<script crossorigin="anonymous"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script crossorigin="anonymous"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"></script>
+<script crossorigin="anonymous"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"></script>
+<div layout:fragment="content">
+    <section id="content">
+            <div class="table-data">
+                        <div class="row justify-content-center col-4" style="text-transform:uppercase">
+                            <h3 style="font-weight: bold;">Taches</h3>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <nav class="navbar navbar-light bg-light" method="get">
+                                    <form class="form-inline" th:action="@{listtache}">
+                                        <input aria-label="Search" class="form-control mr-sm-2" name="keyword"
+                                               placeholder="Chercher une tache" style="font-weight: bold;" th:value="${keyword}" type="search">
+                                        <button class="btn btn-success my-2 my-sm-0" style="font-weight: bold;" type="submit">
+                                            Chercher
+                                        </button>
+                                    </form>
+                                    <span th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                                            <button class="btn btn-secondary btn-sm" data-target="#newtasks-modal" data-toggle="modal"
+                                                    style="font-weight: bold;" th:href="@{CreateTache}" type="button"><i
+                                                    class="bi bi-plus-square"></i>  Nouvelle tache</button>
+                                    </span>
+                                </nav>
+                                <!-- form d'ajout-->
+                                <div aria-hidden="true" aria-labelledby="newtasks" class="modal fade" id="newtasks-modal" role="dialog"
+                                     tabindex="-1">
+                                    <div class="modal-dialog modal-dialog-scrollable" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header" style="background-color:#C0C0C0;">
+                                                <p style="text-transform:uppercase"><h4 class="font-weight-bold" style="text-align:center;">
+                                                Nouvelle Tache</h4></p>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form class="forms-sample" method="post" th:action="@{CreateTache}">
+                                                    <div class="form-group">
+                                                        <label for="nomtache" style="font-weight: bold;">Tache </label> <input
+                                                            class="form-control" id="nomtache" placeholder="" required
+                                                            style="font-weight: bold;" th:field="${tache.nomTch}" type="text">
+                                                    </div>
+                                                    <!--for projects-->
+                                                    <div class="form-group col-md-6">
+                                                        <label for="nomprojet" style="font-weight: bold;">Projet </label>
+                                                        <select name="nomprojet" required style="font-weight: bold; width: 420px;" th:field="${tache.pj}" class="form-control from " >
+                                                            <option hidden value="">--Choisissez Projet--</option>
+                                                            <option th:each="prj : ${projets}" th:text="${prj.getNomPrj()}"
+                                                                    th:value="${prj.getId_projet()}"></option>
+                                                        </select>
+                                                    </div>
+                                                    <!--for employes-->
+                                                    <div class="form-group col-md-6">
+                                                        <label for="nomresponsable" style="font-weight: bold;">Responsable </label>
+                                                        <select name="nomemploye" required style="font-weight: bold; width: 420px;" th:field="${tache.emp}" class="form-control from " >
+                                                            <option hidden value="">--Choisissez Employee--</option>
+                                                            <option th:each="em : ${employees}" th:text="${em.concat()}"
+                                                                    th:value="${em.getId_employee()}"></option>
+                                                        </select>
+                                                    </div>
+                                                    <!--ERROR-->
+                                                    <div class="form-group">
+                                                        <label for="date_affectation" style="font-weight: bold;">Date d'affectation</label>
+                                                        <input class="form-control" id="date_affectation" name="date_affectation"
+                                                               placeholder="" required style="font-weight: bold;" th:field="${tache.dateAffectation}"
+                                                               type="date">
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="last_delai" style="font-weight: bold;"> Dernièr délai </label>
+                                                        <input class="form-control" id="last_delai" name="last_delai" placeholder=""
+                                                               required style="font-weight: bold;" th:field="${tache.last_delai}" type="date">
+                                                    </div>
+                                                    <div class="form-row">
+                                                        <div class="form-group col-md-6">
+                                                            <!--for types-->
+                                                            <label for="typetache" style="font-weight: bold;">Type </label>
+                                                            <select name="nomtype"  style="font-weight: bold;" th:field="${tache.typ}" class="form-control from ">
+                                                                <option hidden value="">--Choisissez Type--</option>
+                                                                <option th:each="tp : ${types}" th:text="${tp.getLibelle_type()}"
+                                                                        th:value="${tp.getId_type()}"></option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group col-md-6">
+                                                            <label for="statustype" style="font-weight: bold;">Status </label>
+                                                            <select name="nomstat"  style="font-weight: bold;" th:field="${tache.stat}" class="form-control from ">
+                                                                <option hidden value="">--Choisissez Status--</option>
+                                                                <option th:each="st : ${status}" th:text="${st.getLibelle_status()}"
+                                                                        th:value="${st.getId_status()}"></option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group col-md-6">
+                                                        <label for="prioritytache" style="font-weight: bold;">Priorité </label>
+                                                        <select name="nompriority"  style="font-weight: bold; width: 420px;"
+                                                                th:field="${tache.prio}" class="form-control from ">
+                                                            <option hidden value="">--Choisissez Priorité--</option>
+                                                            <option th:each="pr : ${priorites}" th:text="${pr.getLibelle_priority()}"
+                                                                    th:value="${pr.getId_priority()}"></option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button class="btn btn-info" style="font-weight: bold;" type="submit">Enregistrer
+                                                        </button>
+                                                        <button class="btn btn-secondary" data-dismiss="modal" style="font-weight: bold;"
+                                                                type="button">Annuler
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- fin form d'ajout-->
+
+                                <table cellpadding="0" cellspacing="0" class="table table-striped" id="myTable" width="100%">
+                                    <thead class="thead-light">
+                                    <tr >
+                                        <th style="text-align:center;"></th>
+                                        <th style="text-align:center;">Projet</th>
+                                        <th style="text-align:center;">Tache</th>
+                                        <th style="text-align:center;">Date d'affectation</th>
+                                        <th style="text-align:center;">Derière date à faire</th>
+                                        <th style="text-align:center;">Responsable</th>
+                                        <th style="text-align:center;">Type</th>
+                                        <th style="text-align:center;">Status</th>
+                                        <th style="text-align:center;">Priorité</th>
+                                        <th style="text-align:center;" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Action</th>
+                                    </tr>
+
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="t:${taches}">
+                                        <td ><a class="btn btn-warning" data-toggle="modal"
+                                               th:data-target="${'#viewhisto-modal' + t.Id_tache}" type="button"><i
+                                                class="bi bi-eye-fill"></i></a>
+                                            <div aria-hidden="true" aria-labelledby="newtasks" class="modal fade" role="dialog"
+                                                 tabindex="-1" th:id="${'viewhisto-modal' + t.Id_tache}">
+                                                <div class="modal-dialog modal-dialog-scrollable" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header" style="background-color:#D1D0CE;">
+                                                            <h5 class="font-weight-bold"><p style="text-transform:uppercase">Historique de
+                                                                la Tache : </P>
+                                                                <p class="text-muted" style="text-align:center;" th:text="${t.nomTch}"></p>
+                                                            </h5>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <table class="table">
+                                                                <thead class="thead-light">
+                                                                <tr>
+                                                                    <th style="text-align:center;">Etat</th>
+                                                                    <th style="text-align:center;">Date de modification</th>
+                                                                    <th style="text-align:center;">Responsable</th>
+                                                                </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                <tr th:each="h:${t.getHistoriques()}">
+                                                                    <td style="text-align:center;" th:text="${h.getEtat()}"></td>
+                                                                    <td style="text-align:center;"
+                                                                        th:text="${#dates.format(h.getDatemodification(), 'dd MMM yyyy')}"></td>
+                                                                    <td style="text-align:center;" th:text="${h.Respo}"></td>
+                                                                </tr>
+                                                                </tbody>
+                                                            </table>
+                                                            <div class="modal-footer">
+                                                                <button type="button" class="btn btn-warning" data-dismiss="modal" style="font-weight: bold;">Fermer</button>
+                                                            </div>
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td style="text-align:center;" th:text="${t.getPj.getNomPrj()}"></td>
+                                        <td style="text-align:center;" th:text="${t.nomTch}"></td>
+                                        <td style="text-align:center;"
+                                            th:text="${#dates.format(t.getDateAffectation(), 'dd MMM yyyy')}"></td>
+                                        <td style="text-align:center;" th:text="${#dates.format(t.Last_delai, 'dd MMM yyyy')}"></td>
+                                        <td style="text-align:center;" th:text="${t.emp.concat()}"></td>
+                                        <td style="text-align:center;" th:text="${t.typ.Libelle_type}"></td>
+                                        <td style="text-align:center;"
+                                            th:text="${t.stat.Libelle_status}"></td>
+                                        <td style="text-align:center;" th:text="${t.prio.Libelle_priority}"></td>
+                                        <td th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                                            <a class="btn btn-danger" data-toggle="modal"
+                                               data-target="#deletetache_modal" type="button"><i
+                                                    class="bi bi-trash"></i></a>
+                                            <a class="btn btn-success" data-toggle="modal"
+                                               th:data-target="${'#edittache-modal' + t.Id_tache}" type="button"><i
+                                                    class="bi bi-pencil"></i></a>
+                                            <a class="btn btn-primary" data-toggle="modal"
+                                               data-target="#annullertache-modal" type="button"><i
+                                                    class="bi bi-x-lg"></i></a>
+                                        </td>
+                                        <!-- confirmation de suppresion-->
+                                        <div class="modal" tabindex="-1" role="dialog" id="deletetache_modal">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Confirmation du suppression</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p class="alert alert-danger">
+                                                            Êtes-vous sûr de suppromer cette tache !?
+                                                        </p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <FORM method="GET" th:action="@{'deleteTache/' + ${t.Id_tache}(keyword=${keyword}, page=${currentPage})}">
+                                                            <button type="submit"  class="btn btn-danger"> Oui, Supprimer</button>
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                                                        </FORM>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- fin de confirmation de suppression-->
+                                        <!-- form de modification-->
+                                        <div class="myForm">
+                                            <div aria-hidden="true" aria-labelledby="newtasks" class="modal fade" role="dialog"
+                                                 tabindex="-1" th:id="${'edittache-modal' + t.Id_tache}">
+                                                <div class="modal-dialog modal-dialog-scrollable" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header" style="background-color:#A0CFEC;">
+                                                            <p style="text-transform:uppercase"><h5 class="font-weight-bold" style="text-align:center;">Modifier les
+                                                            informations du Tache</h5></p>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <form class="forms-sample" method="post"
+                                                                  th:action="@{'updateTache/' + ${t.Id_tache}}">
+                                                                <div class="form-group">
+                                                                    <label for="nomtache" style="font-weight: bold;">Tache </label> <input
+                                                                        class="form-control" id="nomtache" name="nomTch"
+                                                                        placeholder="" required style="font-weight: bold;" th:value="${t.nomTch}"
+                                                                        type="text">
+                                                                </div>
+                                                                <!--for projects-->
+                                                                <div class="form-group col-md-6">
+                                                                    <label  style="font-weight: bold;">Projet </label>
+                                                                    <select name="pj" required style="font-weight: bold;width: 420px;"
+                                                                            th:value="${tache.pj}" class="form-control from ">
+                                                                        <option hidden th:value="${t.pj.Id_projet}" th:text="${t.pj.nomPrj}"> </option>
+                                                                        <option th:each="prj : ${projets}" th:text="${prj.getNomPrj()}"
+                                                                                th:value="${prj.getId_projet()}"></option>
+                                                                    </select>
+                                                                </div>
+                                                                <!--for employes-->
+                                                                <div class="form-group col-md-6">
+                                                                    <label
+                                                                           style="font-weight: bold;">Responsable </label>
+                                                                    <select name="emp" required style="font-weight: bold; width: 420px;"
+                                                                            th:value="${tache.emp}" class="form-control from ">
+                                                                        <option hidden th:value="${t.emp.getId_employee()}" th:text="${t.emp.concat()}"></option>
+                                                                        <option th:each="em : ${employees}" th:text="${em.concat()}"
+                                                                                th:value="${em.getId_employee()}"></option>
+                                                                    </select>
+                                                                </div>
+                                                                <!--Tester la modification des dates-->
+                                                                <!--db n3axad nchodf had le problème dyal les dates après-->
+                                                                <!--<div class="form-group">
+                                                                    <label for="date_affectation" style="font-weight: bold;">Date d'affectation</label>
+                                                                    <input class="form-control" id="date_affectation" name="date_affectation"
+                                                                           required style="font-weight: bold;" th:text="${#dates.format(t.getDateAffectation(), 'dd/MM/yyyy')}"
+                                                                            type="date">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="last_delai" style="font-weight: bold;"> Dernièr délai </label>
+                                                                    <input class="form-control" id="last_delai" name="last_delai" placeholder=""
+                                                                           required style="font-weight: bold;" th:text="${t.last_delai}"
+                                                                           th:value="${t.last_delai}" type="date">
+                                                                </div>-->
+                                                                <div class="form-row">
+                                                                    <div class="form-group col-md-6">
+                                                                        <label for="typetache" style="font-weight: bold;">Type </label>
+                                                                        <select name="typ" required style="font-weight: bold;"
+                                                                                th:value="${tache.typ}" class="form-control from ">
+                                                                            <option hidden th:value="${t.typ.getId_type()}" th:text="${t.typ.getLibelle_type()}"></option>
+                                                                            <option th:each="tp : ${types}" th:text="${tp.getLibelle_type()}"
+                                                                                    th:value="${tp.getId_type()}"></option>
+                                                                        </select>
+                                                                    </div>
+                                                                    <div class="form-group col-md-6">
+                                                                        <label for="statustype" style="font-weight: bold;">Status </label>
+                                                                        <select id="statustype" name="stat" required style="font-weight: bold;"
+                                                                                th:value="${tache.stat}" class="form-control from ">
+                                                                            <option hidden th:value="${t.stat.getId_status()}" th:text="${t.stat.getLibelle_status()}"></option>
+                                                                            <option th:each="st : ${status}" th:text="${st.getLibelle_status()}"
+                                                                                    th:value="${st.getId_status()}"></option>
+                                                                        </select>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="form-group col-md-6">
+                                                                    <label for="prioritytache" style="font-weight: bold;">Priorité </label>
+                                                                    <select name="prio" required style="font-weight: bold; width: 420px;"
+                                                                            th:value="${tache.prio}" class="form-control from ">
+                                                                        <option hidden th:value="${t.prio.getId_priority()}" th:text="${t.prio.getLibelle_priority()}"></option>
+                                                                        <option th:each="pr : ${priorites}"
+                                                                                th:text="${pr.getLibelle_priority()}"
+                                                                                th:value="${pr.getId_priority()}"></option>
+                                                                    </select>
+                                                                </div>
+                                                                <div class="modal-footer">
+                                                                    <button class="btn btn-info" style="font-weight: bold;" type="submit">
+                                                                        Modifier
+                                                                    </button>
+                                                                    <button class="btn btn-secondary" data-dismiss="modal"
+                                                                            style="font-weight: bold;" type="button">Annuler
+                                                                    </button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <!-- fin form de modification-->
+                                        <!-- forme d'annulation -->
+                                        <div class="modal fade" id="annullertache-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title" id="exampleModalLabel">Confirmation d'annulation</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p class="alert alert-danger">
+                                                            Êtes-vous sûr de faire cette annulation !?
+                                                        </p>
+                                                    </div>
+                                                    <form class="forms-sample" method="post" th:action="@{'cancelledStatus/' + ${t.Id_tache}}">
+                                                        <div class="modal-footer">
+                                                            <button type="submit" class="btn btn-danger">Oui, je confirme</button>
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                                                        </div>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!--fin forme d'annulation -->
+                                    </tr>
+
+                                    </tbody>
+
+                                </table>
+                                <ul class="nav nav-pills">
+                                    <li th:each="page,status:${pages}">
+                                        <a th:class="${status.index==currentPage?'btn btn-info ml-1':'btn btn-outline-info ml-1'}"
+                                            th:href="@{listtache(page=${status.index}, keyword=${keyword})}"
+                                            th:text="${status.index}"
+                                        ></a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+        </main>
+    </section>
+</div>
+</body>
+</html>

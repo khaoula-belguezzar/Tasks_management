@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="fr" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{Template}">
+<head>
+    <meta charset="UTF-8">
+    <link href='https://unpkg.com/boxicons@2.0.9/css/boxicons.min.css' rel='stylesheet'>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link href="../static/css/users.css" rel="stylesheet" th:href="@{/css/users.css}" type="text/css">
+    <title>Sync - Espace d'Utilisateurs</title>
+    <link rel="icon" th:href="@{/img/favicon.png}">
+
+
+</head>
+<body>
+<script crossorigin="anonymous"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+<script crossorigin="anonymous"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        src="https://cdn.jsdelivr.net/npm/popper.js@1.14.7/dist/umd/popper.min.js"></script>
+<script crossorigin="anonymous"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        src="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/js/bootstrap.min.js"></script>
+<div layout:fragment="content">
+    <section id="content">
+            <div class="table-data">
+                        <div class="row justify-content-center col-4" style="text-transform:uppercase">
+                            <h3 style="font-weight: bold;">Employées</h3>
+                        </div>
+                        <div class="card">
+                            <div class="card-body">
+                                <nav class="navbar navbar-light bg-light" method="get">
+                                    <form class="form-inline" th:href="@{listemployes}">
+                                        <input aria-label="Search" class="form-control mr-sm-2" name="keyword"
+                                               placeholder="Chercher un employee" style="font-weight: bold;" th:value="${keyword}" type="search">
+                                        <button class="btn btn-success my-2 my-sm-0" style="font-weight: bold;" type="submit">
+                                            Chercher
+                                        </button>
+                                    </form>
+                                    <span class="nav-item" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                                            <button class="btn btn-secondary btn-sm" data-target="#newemployee-modal" data-toggle="modal"
+                                                    style="font-weight: bold;" th:href="@{addEmployee}" type="button"><i
+                                                    class="bi bi-plus-square"></i> Nouveau employée</button>
+                                    </span>
+                                </nav>
+                                <!-- form d'ajout-->
+                                <div aria-hidden="true" aria-labelledby="newtasks" class="modal fade" id="newemployee-modal" role="dialog"
+                                     tabindex="-1">
+                                    <div class="modal-dialog modal-dialog-scrollable" role="document">
+                                        <div class="modal-content">
+                                            <div class="modal-header" style="background-color:#C0C0C0;">
+                                                <p style="text-transform:uppercase"><h4 class="font-weight-bold" style="text-align:center;">
+                                                Nouveau Employée</h4></p>
+                                            </div>
+                                            <div class="modal-body">
+                                                <form class="forms-sample" method="post" th:action="@{addEmployee}">
+                                                    <div class="form-group">
+                                                        <label for="nomemployee" style="font-weight: bold;">Nom </label> <input
+                                                            class="form-control" id="nomemployee" placeholder=""
+                                                            style="font-weight: bold;" th:field="${employee.nom}" type="text">
+
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="prenomemployee" style="font-weight: bold;">Prenom </label> <input
+                                                            class="form-control" id="prenomemployee" placeholder=""
+                                                            style="font-weight: bold;" th:field="${employee.prenom}" type="text">
+                                                        <span th:errors="${employee.prenom}"></span>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="prenomemployee" style="font-weight: bold;">Username </label> <input
+                                                            class="form-control" id="prenomemployee" placeholder=""
+                                                            style="font-weight: bold;" th:field="${employee.username}" type="text">
+                                                        <span th:errors="${employee.username}"></span>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="emailemployee" style="font-weight: bold;">Email </label> <input
+                                                            class="form-control" id="emailemployee" placeholder=""
+                                                            style="font-weight: bold;" th:field="${employee.email}" type="text">
+
+                                                    </div>
+                                                    <!--for fonctions-->
+                                                    <div class="form-row">
+                                                        <div class="form-group col-md-6">
+                                                            <label for="fctemployee" style="font-weight: bold;">Fonction </label>
+                                                            <select name="fct"  style="font-weight: bold;"
+                                                                    th:field="${employee.fonction}" class="form-control from ">
+                                                                <option hidden value="">--Choisissez Type--</option>
+                                                                <option selected="selected" value="Developpeur">Developpeur</option>
+                                                                <option value="Analyseur">Analyseur</option>
+                                                                <option value="Concepteur">Concepteur</option>
+                                                                <option value="Testeur">Testeur</option>
+                                                                <option value="Designer">Designer</option>
+                                                            </select>
+                                                        </div>
+                                                        <div class="form-group col-md-6">
+                                                            <label for="typemployee" style="font-weight: bold;">Type </label>
+                                                            <select name="type"  style="font-weight: bold;"
+                                                                    class="form-control from ">
+                                                                <option hidden value="">--Choisissez Type--</option>
+                                                                <option th:each="role : ${roles}" th:text="${role.getRoleName()}"
+                                                                        th:value="${role.getRoleId()}"></option>
+                                                            </select>
+                                                        </div>
+                                                    </div>
+                                                    <div class="form-group">
+                                                        <label for="pswemployee" style="font-weight: bold;">Mot de passe </label> <input
+                                                            class="form-control" id="pswemployee" placeholder=""
+                                                            style="font-weight: bold;" th:field="${employee.password}" type="password">
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button class="btn btn-info" style="font-weight: bold;" type="submit">
+                                                            Enregistrer
+                                                        </button>
+                                                        <button class="btn btn-secondary" data-dismiss="modal"
+                                                                style="font-weight: bold;" type="button">Annuler
+                                                        </button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- fin form d'ajout-->
+
+                                <table cellpadding="0" cellspacing="0" class="table table-striped " id="tbl-employes" width="100%">
+                                    <thead class="thead-light">
+                                    <tr>
+                                        <th style="text-align:center;">employee</th>
+                                        <th style="text-align:center;">Email</th>
+                                        <th style="text-align:center;">Nom d'utilisateur</th>
+                                        <th style="text-align:center;">Fonction</th>
+                                        <th style="text-align:center;" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">Action</th>
+                                    </tr>
+
+                                    </thead>
+                                    <tbody>
+                                    <tr th:each="E :${employees}">
+                                        <td style="text-align:center;" th:text="${E.concat()}"></td>
+                                        <td style="text-align:center;" th:text="${E.email}"></td>
+                                        <td style="text-align:center;" th:text="${E.username}"></td>
+                                        <td style="text-align:center;" th:text="${E.fonction}"></td>
+                                        <td style="text-align:center;" th:if="${#authorization.expression('hasRole(''ADMIN'')')}">
+                                            <a class="btn btn-danger delBtn"
+                                               data-toggle="modal"
+                                               data-target="#deleteemployee-modal" type="button">
+                                                <i class="bi bi-trash"></i></a>
+                                            <a class="btn btn-success" data-toggle="modal"
+                                               th:data-target="${'#editemployee-modal' + E.Id_employee}" type="button"><i
+                                                    class="bi bi-pencil"></i></a>
+                                        </td>
+                                        <!-- form de modification-->
+                                        <div class="myForm">
+                                            <div aria-hidden="true" aria-labelledby="editemp" class="modal fade"
+                                                 role="dialog" tabindex="-1" th:id="${'editemployee-modal' + E.Id_employee}">
+                                                <div class="modal-dialog modal-dialog-scrollable" role="document">
+                                                    <div class="modal-content">
+                                                        <div class="modal-header" style="background-color:#A0CFEC;">
+                                                            <p style="text-transform:uppercase"><h5 class="font-weight-bold"
+                                                                                                    style="text-align:center;">Modifier les
+                                                            informations des Employées</h5></p>
+                                                        </div>
+                                                        <div class="modal-body">
+                                                            <form class="forms-sample" method="POST"
+                                                                  th:action="@{'updateEmployee/' + ${E.Id_employee}}">
+                                                                <!--<div class="form-group">
+                                                                    <label for="idemployee" style="font-weight: bold;">ID_employee  </label>
+                                                                    <label th:text="${E.Id_employee}" style="font-weight: bold;"></label>
+                                                                    <input
+                                                                        class="form-control" id="idemployee" name="Id_employee"
+                                                                        placeholder=""  style="font-weight: bold;" th:value="${E.Id_employee}"
+                                                                        type="hidden">
+                                                                </div>-->
+                                                                <div class="form-group">
+                                                                    <label for="nomemployee" style="font-weight: bold;">Nom</label> <input
+                                                                        class="form-control" id="nomemployee" name="nom"
+                                                                        placeholder=""  style="font-weight: bold;" th:value="${E.nom}"
+                                                                        type="text">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="prenomemployee" style="font-weight: bold;">Prenom</label>
+                                                                    <input class="form-control" id="prenomemployee" name="prenom"
+                                                                           placeholder=""  style="font-weight: bold;" th:value="${E.prenom}"
+                                                                           type="text">
+                                                                </div>
+                                                                <div class="form-group">
+                                                                    <label for="emailemployee" style="font-weight: bold;">Email</label>
+                                                                    <input class="form-control" id="emailemployee" name="email"
+                                                                           placeholder=""  style="font-weight: bold;" th:value="${E.email}"
+                                                                           type="text">
+                                                                </div>
+                                                                <!--for fonctions-->
+                                                                <div class="form-row">
+                                                                        <label for="fctemployee" style="font-weight: bold;">Fonction</label>
+                                                                        <select id="fctemployee" name="fonction"
+                                                                                style="font-weight: bold;" th:value="${E.getFonction()}" class="form-control from ">
+                                                                            <option hidden th:text="${E.getFonction()}"></option>
+                                                                            <option value="Developpeur">Developpeur</option>
+                                                                            <option value="Analyseur">Analyseur</option>
+                                                                            <option value="Concepteur">Concepteur</option>
+                                                                            <option value="Testeur">Testeur</option>
+                                                                            <option value="Designer">Designer</option>
+                                                                        </select>
+<!--                                                                    <div class="form-group col-md-6">-->
+<!--                                                                        <label for="typemployee" style="font-weight: bold;">Type</label>-->
+<!--                                                                        <select id="typemployee" name="type"  style="font-weight: bold;"-->
+<!--                                                                                th:value="${E.getType()}" class="form-control from ">-->
+<!--                                                                            <option hidden th:text="${E.getType()}"></option>-->
+<!--                                                                            <option th:each="role : ${roles}" th:text="${role.getRoleName()}"-->
+<!--                                                                                    th:value="${role.getRoleId()}"></option>-->
+<!--                                                                        </select>-->
+<!--                                                                    </div>-->
+                                                                </div>
+<!--                                                                <div class="form-group">-->
+<!--                                                                    <label for="pswemployee" style="font-weight: bold;">Mot de passe-->
+<!--                                                                        : </label> <input class="form-control" id="pswemployee"-->
+<!--                                                                                          name="password" placeholder=""-->
+<!--                                                                                          style="font-weight: bold;" th:value="${E.password}" type="password">-->
+
+<!--                                                                </div>-->
+                                                                <div class="modal-footer">
+                                                                    <button class="btn btn-info" style="font-weight: bold;" type="submit">
+                                                                        Enregistrer
+                                                                    </button>
+                                                                    <button class="btn btn-secondary" data-dismiss="modal"
+                                                                            style="font-weight: bold;" type="button">Annuler
+                                                                    </button>
+                                                                </div>
+                                                            </form>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- fin form de modification-->
+                                        <!-- confirmation de suppresion-->
+                                        <div class="modal" tabindex="-1" role="dialog" id="deleteemployee-modal">
+                                            <div class="modal-dialog" role="document">
+                                                <div class="modal-content">
+                                                    <div class="modal-header">
+                                                        <h5 class="modal-title">Confirmation du suppression</h5>
+                                                        <button type="button" class="close" data-dismiss="modal" aria-label="close">
+                                                            <span aria-hidden="true">&times;</span>
+                                                        </button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p class="alert alert-danger">
+                                                            Êtes-vous sûr de supprimer ce Employée !?
+                                                        </p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <FORM method="GET" th:action="@{'deleteEmployeee/' + ${E.Id_employee}}">
+                                                            <button type="submit"  class="btn btn-danger"> Oui, Supprimer</button>
+                                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Annuler</button>
+                                                        </FORM>
+                                                    </div>
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- fin de confirmation de suppression-->
+                                    </tr>
+                                    </tbody>
+                                </table>
+                                <ul class="nav nav-pills">
+                                    <li th:each="page,status:${pages}">
+                                        <a th:class="${status.index==currentPage?'btn btn-info ml-1':'btn btn-outline-info ml-1'}"
+                                           th:href="@{listemployes(page=${status.index}, keyword=${keyword})}"
+                                           th:text="${status.index}"
+                                        ></a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+    </section>
+</div>
+</body>
+</html>
